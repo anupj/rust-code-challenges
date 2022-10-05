@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 // Filters duplicates within a list.
 // Accepts a Vec<i32> reference and returns a
 // Vec<i32> with no duplicates.
@@ -67,7 +66,7 @@ mod tests {
     fn test_unsorted_list_with_duplicates() {
         let list = vec![3, 3, 1];
         assert_eq!(vec![1, 3], unique(&list));
-        let list2: Vec<&str> = vec!["abc", "hij", "def", "def"];
-        assert_eq!(vec!["abc", "def", "hij"], generic_unique(&list2));
+        let list2: Vec<&str> = vec!["abc", "abc", "hij", "xyz", "def", "def"];
+        assert_eq!(vec!["abc", "def", "hij", "xyz"], generic_unique(&list2));
     }
 }
