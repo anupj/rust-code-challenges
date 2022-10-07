@@ -4,48 +4,92 @@
 /// Extra credit
 ///  - long run & arbitrary byte streams
 
-pub fn run_length_encode(input: &str) -> String {
-    let mut encoded_str = String::new();
-    if input.is_empty() {
-        return encoded_str;
-    }
-    let mut char_count = 1u32;
-    let mut prev_char = input.chars().next().unwrap();
-
-    for (i, c) in input.chars().enumerate() {
-        if i == 0 {
-            println!("i is {}", i);
-            continue;
+mod run_length_encoding {
+    pub fn encode(input: &str) -> String {
+        if input.is_empty() {
+            return String::with_capacity(0);
         }
-        if c == prev_char {
-            char_count += 1;
-        } else {
-            encoded_str.push_str(&char_count.to_string());
-            encoded_str.push_str(&prev_char.to_string());
-            prev_char = c;
-            char_count = 1;
-        }
-    }
-    encoded_str.push_str(&char_count.to_string());
-    encoded_str.push_str(&prev_char.to_string());
+        let mut encoded_str = String::with_capacity(input.len() / 2);
+        // Starting with 1 because we know
+        // atleast 1 char will be encountered
+        let mut char_count = 1u32;
+        // setting prev_char to be the first char
+        // in the input string
+        let mut prev_char = input.chars().next().unwrap();
 
-    encoded_str
+        for (i, c) in input.chars().enumerate() {
+            if i == 0 {
+                // skip the loop
+                // if its the first char
+                continue;
+            }
+            if c == prev_char && char_count < 9 {
+                // keep going if the current char
+                // is the same as previous char
+                // until we encounter 9 such chars
+                char_count += 1;
+            } else {
+                encoded_str.push_str(&format!("{}{}", char_count, prev_char));
+                prev_char = c;
+                char_count = 1;
+            }
+        }
+        encoded_str.push_str(&format!("{}{}", char_count, prev_char));
+
+        encoded_str
+    }
+
+    pub fn decode(input: &str) -> String {
+        if input.is_empty() {
+            return String::with_capacity(0);
+        }
+        let mut result = String::with_capacity(input.len() * 2);
+        let mut chars = input.chars();
+
+        while let (Some(n), Some(c)) = (chars.next(), chars.next()) {
+            // Convert from char to u32
+            let n = n.to_digit(10).unwrap();
+            for _ in 0..n {
+                result.push(c);
+            }
+        }
+
+        result
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::run_length_encoding::*;
 
     #[test]
     fn test_non_repeating_string() {
-        assert_eq!(
-            "1L1i1n1k1e1d1I1n".to_string(),
-            run_length_encode("LinkedIn")
-        );
+        assert_eq!("1L1i1n1k1e1d1I1n".to_string(), encode("LinkedIn"));
     }
 
     #[test]
     fn test_repeating_string() {
-        assert_eq!("5A1a2A".to_string(), run_length_encode("AAAAAaAA"));
+        assert_eq!("5A1a2A".to_string(), encode("AAAAAaAA"));
+    }
+
+    #[test]
+    fn test_abc() {
+        let input = "abc";
+        assert_eq!(encode(input), "1a1b1c");
+        assert_eq!(decode(&encode(input)), input);
+    }
+
+    #[test]
+    fn test_round_trip() {
+        let input = "LinkedIn";
+        println!("encoded input is: {}", encode(&input));
+        assert_eq!(decode(&encode(input)), input);
+    }
+
+    #[test]
+    fn test_long_run() {
+        let input = "AAAAA AAAAAAAAAA AAAAAAAAAAAAAAAAAAAA";
+        assert_eq!(encode(&input), "5A1 9A1A1 9A9A2A");
+        assert_eq!(decode(&encode(input)), input);
     }
 }
