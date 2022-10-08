@@ -70,8 +70,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        // let result = add(2, 2);
-        // assert_eq!(result, 4);
+    fn test_ymd_hyphen() {
+        assert_eq!(flexible_date_parser("2020-12-11"), Some(NaiveDate::from_ymd(2020, 12, 11)) );
+    }
+
+    #[test]
+    fn test_ymd_slash() {
+        assert_eq!(flexible_date_parser("2020/Mar/11"), Some(NaiveDate::from_ymd(2020, 3, 11)) );
+    }
+
+    #[test]
+    fn test_dmy_dot() {
+        assert_eq!(flexible_date_parser("01.Mar.2022"), Some(NaiveDate::from_ymd(2022, 3, 1)) );
+    }
+    #[test]
+    fn test_mdy_dot() {
+        assert_eq!(flexible_date_parser("Apr.05.2021"), Some(NaiveDate::from_ymd(2021, 4, 5)) );
+    }
+    #[test]
+    fn invalid() {
+        assert_eq!(flexible_date_parser("not a date"), None );
     }
 }
